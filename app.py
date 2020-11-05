@@ -61,7 +61,7 @@ def not_found(error):
 
 
 
-@app.route('/')
+@app.route('/',methods=['GET', 'POST'])
 def index():
     
 
