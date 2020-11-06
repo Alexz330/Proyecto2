@@ -1,25 +1,37 @@
-
 {% extends 'base.html' %}
 {% import 'macros.html' as macros %}
 {% import 'bootstrap/wtf.html' as wtf %}
-    
+
 {% block title %}
-    {{ super() }}
-    Bienvenido
+{{ super() }}
+Bienvenido
 {% endblock %}
 
 
 {% block styles %}
-    {{super()}}
-    <link rel="stylesheet" href="{{url_for('.static', filename='signin.css')}}">
+{{super()}}
+<link rel="stylesheet" href="{{url_for('.static', filename='signin.css')}}">
 {% endblock %}
 
 {% block content %}
-   
-  
-    <h1 class="page-header"></h1>
-    <h1 class="display-4 text-center title mt-4">Bienvenido, {{ name | capitalize }}</h1>
-    
-    
-      
+
+Perfil
+
+
+{% if session['name'] %}
+
+
+Welcome {{ session['name'] }}
+
+
+{% else %}
+
+
+Not login
+
+
+{% endif %}
+
+
+
 {% endblock %}

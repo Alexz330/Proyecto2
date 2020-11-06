@@ -1,42 +1,27 @@
 {% extends 'base.html' %}
 {% import 'macros.html' as macros %}
 {% import 'bootstrap/wtf.html' as wtf %}
-    
+
 {% block title %}
-    {{ super() }}
-    Bienvenido
+{{ super() }}
+Bienvenido
 {% endblock %}
 
 {% block content %}
-    {% if username %}
-        <h1>Bienvenido, {{ Username | capitalize }}</h1>
-    {% endif %}
+{% if username %}
+<h1>Bienvenido, {{ Username | capitalize }}</h1>
+{% endif %}
 
-    {% if user_ip %}
-        <h3>Tu IP es {{ user_ip }}</h3>
-    {% else %}
-        <a href="{{ url_for('index') }}">Ir a inicio</a>
-    {% endif %}
+{% if user_ip %}
+<h3>Tu IP es {{ user_ip }}</h3>
+{% else %}
+<a href="{{ url_for('index') }}">Ir a inicio</a>
+{% endif %}
 
-    <!-- <div class="container">
-        <form action="{{ url_for('hello')}}" method="POST">
-            {{ login_form.username }}
-            {{ login_form.username.label }}
-        </form>
-        {{ wtf.quick_form(login_form) }}
-    </div> -->
 
-    <div class="container">
 
-        <form class="form-signin" method="POST" action="/login">
-          <h2 class="form-signin-heading">Login Bien perro</h2>
-          
-          {{ form.hidden_tag() }}
-          {{ wtf.form_field(form.username) }}
-          {{ wtf.form_field(form.password) }}
-          {{ wtf.form_field(form.remember) }}
 
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Ingresar</button>
-        </form>
+
+
 
 {% endblock %}
