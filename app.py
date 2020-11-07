@@ -16,9 +16,9 @@ app = Flask(__name__)
 
 # Mysql Connection
 app.config['MYSQL_HOST'] = 'us-cdbr-east-02.cleardb.com' 
-app.config['MYSQL_USER'] = 'b54ba59849d9d1'
-app.config['MYSQL_PASSWORD'] = 'e2d9526a'
-app.config['MYSQL_DB'] = 'heroku_08ae2456d7f7f1d'
+app.config['MYSQL_USER'] = 'b4a513e32e9681'
+app.config['MYSQL_PASSWORD'] = '667ca586'
+app.config['MYSQL_DB'] = 'heroku_76088dfc864cda7'
 
 mysql = MySQL(app)
 
@@ -109,32 +109,75 @@ def Perfil():
     return render_template('perfil.html',)
 
 
+#Creando el Crud de usuarios
+
+@app.route('/static/Crud_user.html')
+def Crud_user():
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM users')
+    data = cur.fetchall()
+    cur.close()
+    return render_template('Crud_user.html', users = data)
 
 
-@app.route('/static/Signup.html')
-def crearUsuario():
-    return render_template('Signup.html')
+@app.route('/edit/<id>', methods = ['POST', 'GET'])
+def get_user(id):
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM users WHERE id = %s', [id])
+    data = cur.fetchall()
+    cur.close()
+    print(data[0])
+    return render_template('edit-users.html', users = data[0])
+
+
+@app.route('/delete/<string:id>', methods = ['POST','GET'])
+def delete_contact(id):
+    cur = mysql.connection.cursor()
+    cur.execute('DELETE FROM users WHERE id = {0}'.format(id))
+    mysql.connection.commit()
+    flash('Contact Removed Successfully')
+    return render_template('Crud_user.html')
+
+@app.route('/update/<id>', methods=['POST'])
+def update_contact(id):
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            UPDATE users
+            SET name = %s,
+                email = %s,
+                password = %s
+            WHERE id = %s
+        """, (name, email, password, id))
+        flash('Ussuario actualizado con extito')
+        mysql.connection.commit()
+        return render_template('Crud_user.html')
 
 
 
 
+
+
+#Metodo para regitrar e ingresar usuarios
 @app.route('/login', methods=['GET', 'POST'])
 def hello():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password'].encode('utf-8')
-        
 
         curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        curl.execute("SELECT * FROM usu WHERE email=%s",(email,))
-        usu = curl.fetchone()
+        curl.execute("SELECT * FROM users WHERE email=%s",(email,))
+        user = curl.fetchone()
         curl.close()
 
-        if len(usu) > 0:
-            if bcrypt.hashpw(password, usu["password"].encode('utf-8')) == usu["password"].encode('utf-8'):
-                session['name'] = usu['name']
-                session['email'] = usu['email']
-                return render_template("perfil.html")
+        if len(user) > 0:
+            if bcrypt.hashpw(password, user["password"].encode('utf-8')) == user["password"].encode('utf-8'):
+                session['name'] = user['name']
+                session['email'] = user['email']
+                return render_template("home.html")
             else:
                 return "Error password and email not match"
         else:
@@ -152,19 +195,19 @@ def hello():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'GET':
-        return render_template("Signup.html")
+        return render_template("signup.html")
     else:
         name = request.form['name']
         email = request.form['email']
         password = request.form['password'].encode('utf-8')
         hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
-        
-        print(name)
+
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO usu (name, email, password) VALUES (%s,%s,%s)",(name,email,hash_password,))
+        cur.execute("INSERT INTO users (name, email, password) VALUES (%s,%s,%s)",(name,email,hash_password,))
         mysql.connection.commit()
         session['name'] = request.form['name']
         session['email'] = request.form['email']
+        flash('se registro correctamente')
         return redirect(url_for('index'))
   
 
@@ -175,6 +218,74 @@ def register():
 def logout():
     session.clear()
     return render_template("cartillas.html")
+
+
+
+#Creando crud de biblioteca
+
+@app.route('/static/biblioteca.html')
+def Crud_juegos():
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM juegos')
+    data = cur.fetchall()
+    cur.close()
+    return render_template('biblioteca.html', juegos = data)
+
+
+@app.route('/editG/<id>', methods = ['POST', 'GET'])
+def get_juegos(id):
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM juegos WHERE id = %s', [id])
+    data = cur.fetchall()
+    cur.close()
+    print(data[0])
+    return render_template('edit-biblioteca.html', juegos = data[0])
+
+
+@app.route('/deleteG/<string:id>', methods = ['POST','GET'])
+def delete_juegos(id):
+    cur = mysql.connection.cursor()
+    cur.execute('DELETE FROM juegos WHERE id = {0}'.format(id))
+    mysql.connection.commit()
+    flash('juego eliminado con exito')
+    return render_template('biblioteca.html')
+
+@app.route('/updateG/<id>', methods=['POST'])
+def update_juegos(id):
+    if request.method == 'POST':
+        name = request.form['name']
+        genero = request.form['genero']
+        imagen = request.form['imagen']
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            UPDATE juegos
+            SET name = %s,
+                genero = %s,
+                imagen = %s
+            WHERE id = %s
+        """, (name, genero, imagen, id))
+        flash('Juego actualizado con extito')
+        mysql.connection.commit()
+        return render_template('Biblioteca.html')        
+
+
+
+
+@app.route('/add_contact', methods=['POST'])
+def add_contact():
+    if request.method == 'POST':
+        name = request.form['name']
+        genero = request.form['genero']
+        imagen = request.form['imagen']
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO juegos (name, genero, imagen) VALUES (%s,%s,%s)", (name, genero, imagen))
+        mysql.connection.commit()
+        flash('juego Added successfully')
+        return redirect(render_template('biblioteca.html'))
+
+
+
+
 
 
 
