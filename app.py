@@ -5,7 +5,8 @@ from flask_bootstrap import Bootstrap
 
 from flask_sqlalchemy import SQLAlchemy
 
-from flask_mysqldb import MySQL
+import mysql.connector
+from flask_mysqldb import MySQL,MySQLdb
 import bcrypt
 app = Flask(__name__)
 
@@ -17,8 +18,8 @@ app = Flask(__name__)
 app.config['MYSQL_HOST'] = 'localhost' 
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'usuarios'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.config['MYSQL_DB'] = 'base'
+
 mysql = MySQL(app)
 
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///DataBase.db"
@@ -119,6 +120,28 @@ def crearUsuario():
 
 @app.route('/login', methods=['GET', 'POST'])
 def hello():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password'].encode('utf-8')
+        
+
+        curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        curl.execute("SELECT * FROM usu WHERE email=%s",(email,))
+        usu = curl.fetchone()
+        curl.close()
+
+        if len(usu) > 0:
+            if bcrypt.hashpw(password, usu["password"].encode('utf-8')) == usu["password"].encode('utf-8'):
+                session['name'] = usu['name']
+                session['email'] = usu['email']
+                return render_template("perfil.html")
+            else:
+                return "Error password and email not match"
+        else:
+            return "Error user not found"
+    else:
+        return render_template("login.html")
+    
      
 
     return render_template('login.html')
@@ -135,9 +158,10 @@ def register():
         email = request.form['email']
         password = request.form['password'].encode('utf-8')
         hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
-
+        
+        print(name)
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users (name, email, password) VALUES (%s,%s,%s)",(name,email,hash_password,))
+        cur.execute("INSERT INTO usu (name, email, password) VALUES (%s,%s,%s)",(name,email,hash_password,))
         mysql.connection.commit()
         session['name'] = request.form['name']
         session['email'] = request.form['email']
@@ -147,12 +171,10 @@ def register():
     
 
 
-@app.route('/logout')
-
+@app.route('/logout', methods=["GET", "POST"])
 def logout():
-    logout_user()
-    return redirect(url_for('index'))
-
+    session.clear()
+    return render_template("cartillas.html")
 
 
 
