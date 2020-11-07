@@ -1,3 +1,5 @@
+heroku ps:scale worker=1
+heroku ps:resize worker=standard-2x
 heroku ps:scale web=1
 web: gunicorn app:app
 
