@@ -2,7 +2,7 @@ from flask import Flask, request, make_response, redirect, render_template, sess
 from flask_bootstrap import Bootstrap
 
 
-
+import pdfkit
 from flask_sqlalchemy import SQLAlchemy
 
 import mysql.connector
@@ -97,6 +97,7 @@ def cargaMasiva():
 @app.route('/static/cartillas.html')
 
 def cartillas():
+
     return render_template('cartillas.html')
 
 
@@ -107,6 +108,33 @@ def cartillas():
 
 def Perfil():
     return render_template('perfil.html',)
+
+
+@app.route('/static/Reportes-juegos.html')
+
+
+def reportes_juegos():
+  
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM juegos')
+    data = cur.fetchall()
+    cur.close()
+    return render_template('Reportes-juegos.html', juegos = data)
+
+
+
+@app.route('/static/Reportes-usuarios.html')
+
+
+def reportes_usuarios():
+  
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT * FROM users')
+    data = cur.fetchall()
+    cur.close()
+    return render_template('Reportes-usuarios.html', users = data)
+
+
 
 
 #Creando el Crud de usuarios
