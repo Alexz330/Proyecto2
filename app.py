@@ -264,14 +264,23 @@ def registerAdmin():
         #hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users (name, email, password,rol) VALUES (%s,%s,%s)",(name,email,password,rol))
+        cur.execute("INSERT INTO users (name, email, password,rol) VALUES (%s,%s,%s,%s)",(name,email,password,rol))
         mysql.connection.commit()
-        session['name'] = request.form['name']
-        session['email'] = request.form['email']
         flash('se registro correctamente')
-        return redirect(url_for('index'))
+        return redirect(url_for('listaUsuario'))
+        #return render_template("Crud_user.html")
     
+@app.route('/formnuevouser',methods=['GET'])
+def irNuevoUser():
+    return render_template("formularioUserAdmin.html")
 
+@app.route('/formnuevousern',methods=['GET'])
+def irNuevoUserN():
+    return render_template("formularioUser.html")    
+
+@app.route('/listausuario',methods=['GET'])
+def listaUsuario():
+    return render_template("Crud_user.html")
 
 @app.route('/logout', methods=["GET", "POST"])
 def logout():
