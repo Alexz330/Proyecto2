@@ -257,7 +257,7 @@ def irLogin():
     
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/register', methods=['POST'])
 def register():
     if request.method == 'GET':
         return render_template("signup.html")
@@ -272,6 +272,7 @@ def register():
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO users (name, email, password,rol) VALUES (%s,%s,%s,%s)",(name,email,password,rol))
         mysql.connection.commit()
+        curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         curl.execute("SELECT * FROM users WHERE email=%s",(email,))
         user = curl.fetchone()
         session['name'] = user['name']
