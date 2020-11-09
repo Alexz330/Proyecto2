@@ -96,7 +96,6 @@ def cargaMasiva():
 
 
 @app.route('/static/cartillas.html')
-
 def cartillas():
 
     return render_template('cartillas.html')
@@ -104,11 +103,38 @@ def cartillas():
 
 
 
-@app.route('/static/perfil.html')
+@app.route('/perfil', methods=['GET'])
+def perfil():
+
+    cur = mysql.connection.cursor()
+    id = session['id']
+    cur.execute('SELECT * FROM users WHERE id = %s',[id])
+    data = cur.fetchall()
+    cur.close()
+    return render_template('perfil.html', users = data)
 
 
-def Perfil():
-    return render_template('perfil.html',)
+
+@app.route('/ActualizarPerfil', methods=['POST'])
+def ActualizarPerfil():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        cur = mysql.connection.cursor()
+        cur.execute("""
+            UPDATE users
+            SET name = %s,
+                email = %s,
+                password = %s
+            WHERE id = %s
+        """, (name, email, password, session['id']))
+        flash('Ussuario actualizado con extito')
+        mysql.connection.commit()
+        return redirect(url_for('perfil'))
+
+
+
 
 
 @app.route('/static/Reportes-juegos.html')
@@ -209,6 +235,8 @@ def validarLogin():
                 session['name'] = user['name']
                 session['email'] = user['email']
                 session['rol'] = user['rol']
+                session['id'] = user['id']
+
                 return render_template("cartillas.html")
             else:
                 return "Error password and email not match"
@@ -244,9 +272,13 @@ def register():
         cur = mysql.connection.cursor()
         cur.execute("INSERT INTO users (name, email, password,rol) VALUES (%s,%s,%s,%s)",(name,email,password,rol))
         mysql.connection.commit()
-        session['name'] = request.form['name']
-        session['email'] = request.form['email']
-        session['rol'] = rol
+        curl.execute("SELECT * FROM users WHERE email=%s",(email,))
+        user = curl.fetchone()
+        session['name'] = user['name']
+        session['email'] = user['email']
+        session['rol'] = user['rol']
+        session['id'] = user['id']
+
         flash('se registro correctamente')
         return redirect(url_for('index'))
   
