@@ -74,14 +74,15 @@ def not_found(error):
 
 
 
-@app.route('/',methods=['GET', 'POST'])
+@app.route('/',methods=['GET'])
 def index():
     
 
-    response = make_response(redirect('/login'))
+    #response = make_response(redirect('/login'))
+     return render_template("cartillas.html")
     
 
-    return response
+    #return response
 
 
 
@@ -190,11 +191,12 @@ def update_contact(id):
 
 
 #Metodo para regitrar e ingresar usuarios
-@app.route('/login', methods=['GET', 'POST'])
-def hello():
+@app.route('/validarLogin', methods=['GET', 'POST'])
+def validarLogin():
     if request.method == 'POST':
         email = request.form['email']
-        password = request.form['password'].encode('utf-8')
+        #password = request.form['password'].encode('utf-8')
+        password = request.form['password']
 
         curl = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         curl.execute("SELECT * FROM users WHERE email=%s",(email,))
@@ -202,22 +204,29 @@ def hello():
         curl.close()
 
         if len(user) > 0:
-            if bcrypt.hashpw(password, user["password"].encode('utf-8')) == user["password"].encode('utf-8'):
+            #if bcrypt.hashpw(password, user["password"].encode('utf-8')) == user["password"].encode('utf-8'):
+            if password == user["password"]:
                 session['name'] = user['name']
                 session['email'] = user['email']
-                return render_template("home.html")
+                session['rol'] = user['rol']
+                return render_template("cartillas.html")
             else:
                 return "Error password and email not match"
         else:
             return "Error user not found"
     else:
-        return render_template("login.html")
+        return render_template("cartillas.html")
     
      
 
-    return render_template('login.html')
+    #return render_template('login.html')
 
-       # return'<h1>nombre de usuario o contraseña incorrecta</h1>'    
+
+@app.route('/login')
+def irLogin():
+    return render_template('Login.html')
+
+    
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -227,18 +236,40 @@ def register():
     else:
         name = request.form['name']
         email = request.form['email']
-        password = request.form['password'].encode('utf-8')
-        hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
+        #password = request.form['password'].encode('utf-8')
+        password = request.form['password']
+        rol = 'user'
+        #hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
 
         cur = mysql.connection.cursor()
-        cur.execute("INSERT INTO users (name, email, password) VALUES (%s,%s,%s)",(name,email,hash_password,))
+        cur.execute("INSERT INTO users (name, email, password,rol) VALUES (%s,%s,%s,%s)",(name,email,password,rol))
+        mysql.connection.commit()
+        session['name'] = request.form['name']
+        session['email'] = request.form['email']
+        session['rol'] = rol
+        flash('se registro correctamente')
+        return redirect(url_for('index'))
+  
+
+@app.route('/registeradmin', methods=['GET', 'POST'])
+def registerAdmin():
+    if request.method == 'GET':
+        return render_template("signup.html")
+    else:
+        name = request.form['name']
+        email = request.form['email']
+        #password = request.form['password'].encode('utf-8')
+        password = request.form['password']
+        rol = 'admin'
+        #hash_password = bcrypt.hashpw(password, bcrypt.gensalt())
+
+        cur = mysql.connection.cursor()
+        cur.execute("INSERT INTO users (name, email, password,rol) VALUES (%s,%s,%s)",(name,email,password,rol))
         mysql.connection.commit()
         session['name'] = request.form['name']
         session['email'] = request.form['email']
         flash('se registro correctamente')
         return redirect(url_for('index'))
-  
-
     
 
 
