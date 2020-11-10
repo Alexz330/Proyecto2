@@ -73,7 +73,6 @@ def not_found(error):
 
 
 
-
 @app.route('/',methods=['GET'])
 def index():
     
@@ -84,6 +83,11 @@ def index():
 
     #return response
 
+@app.route('/static/informacion.html')
+def informacionJuego():
+
+     return render_template("Informacion.html")
+    
 
 
 
