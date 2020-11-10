@@ -21,19 +21,10 @@ Bienvenido
 <div class="row">
     <div class="col-md-4 offset-md-4">
       <div class="card card-body">
-        <form action="/updateG/{{juegos.0}}" method="POST">
+        <form action="/update/{{users.0}}" method="POST">
+        
           <div class="form-group">
-              <label for="">Nombre del Juego</label>
-            <input type="text" name="name" value="{{juegos.1}}" class="form-control">
-          </div>
-          
-          <div class="form-group">
-            <label for="">Genero</label>
-            <input type="text" name="genero" value="{{juegos.2}}" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="">Link de la Imagen</label>
-            <input type="text" name="imagen" value="{{juegos.3}}" class="form-control">
+            <input type="text" name="password" value="{{users.3}}" class="form-control">
           </div>
           <div class="form-group">
             <button type="submit" class="btn btn-primary btn-block">

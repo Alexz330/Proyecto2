@@ -15,13 +15,15 @@ Bienvenido
 
 {% block content %}
 
-Perfil
+
 
 
 {% if session['name'] %}
 
+<h1 class="display-1"><span class="text-muted">Perfil ,Welcome {{ session['name'] }}</span></h1>
 
-Welcome {{ session['name'] }}
+<hr>
+
 
 
 {% else %}
@@ -31,7 +33,10 @@ Not login
 
 
 {% endif %}
-
+<hr>
+<div>
+  <a href="/edit/{{users.0}}" class="btn btn-success">ver contraseseña</a>
+</div> 
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
