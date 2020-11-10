@@ -83,10 +83,10 @@ def index():
 
     #return response
 
-@app.route('/static/informacion.html')
+@app.route('/informacion.html')
 def informacionJuego():
 
-     return render_template("Informacion.html")
+     return render_template("informacion.html")
     
 
 
